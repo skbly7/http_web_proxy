@@ -15,7 +15,7 @@ class WebProxyServer:
         # Number of requests to put into queue, as the chrome/client can send many requests at a
         # time, I am having this value to be large.
         self.socket.listen(5)
-        self.size = 2048
+        self.size = 8192
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.parent_proxy = False
         self.debug = debug
@@ -82,14 +82,19 @@ class WebProxyServer:
         # Open a new socket for fetching the URL
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0)
 
-        # Resolving the URL to get IP
+        # Resolving the URL to get IP (or using Host directly if present
         host_name = parsed_request['URL'].split("//")[-1].split("/")[0]
+        if 'Host' in parsed_request:
+            host_name = parsed_request['Host']
         connect_port = 80
         if ":" in host_name:
             host_name = host_name.split(':')
             connect_port = int(host_name[1])
             host_name = host_name[0]
-        resolved_ip = socket.gethostbyname(host_name)
+        try:
+            resolved_ip = socket.gethostbyname(host_name)
+        except:
+            return {}, {}
 
         # Making the request
         client_socket.connect((resolved_ip, connect_port))
