@@ -2,6 +2,7 @@ import socket
 import time
 import threading
 
+
 class WebProxyServer:
     """Intercept proxy request from clients"""
 
@@ -83,7 +84,7 @@ class WebProxyServer:
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0)
 
         # Resolving the URL to get IP (or using Host directly if present
-        host_name = parsed_request['URL'].split("//")[-1].split("/")[0]
+        host_name = parsed_request['URL'].split("//")[-1].split("/")[0].strip()
         if 'Host' in parsed_request:
             host_name = parsed_request['Host']
         connect_port = 80
@@ -195,3 +196,4 @@ class WebProxyServer:
 
     def close(self):
         self.socket.close()
+
